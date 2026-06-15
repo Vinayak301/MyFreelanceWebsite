@@ -11,6 +11,15 @@ body
 	align-items:center;
 	padding-top:80px;
 }
+.about-section
+{
+	min-height:100vh;
+	background:linear-gradient(135deg, #0f172a, #1e293b);
+	color:white;
+	display:flex;
+	align-items:center;
+	padding-top:80px;
+}
 .name
 {font-size:55px;
 font-weight:bold;

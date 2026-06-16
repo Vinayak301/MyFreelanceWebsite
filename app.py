@@ -10,12 +10,13 @@ UPLOAD_FOLDER = 'static/images/projects'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = "mysecretkey" # Set a secret key for session management
 
-db = mysql.connector.connect( 
-    host="localhost",
-    user="root",
-    password="root",
+db = mysql.connector.connect(
+    host="127.0.0.1",
+    user="portfolio_user",
+    password="Portfolio@123",
     database="portfolio_db"
 )
+
 mysql = MySQL(app)
 
 @app.route('/')

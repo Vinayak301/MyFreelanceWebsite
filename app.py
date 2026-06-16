@@ -16,7 +16,7 @@ db = mysql.connector.connect(
     database="portfolio_db"
 )
 
-mysql = MySQL(app)
+
 
 @app.route('/')
 def home():

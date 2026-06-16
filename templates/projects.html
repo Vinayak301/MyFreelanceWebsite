@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}
+Projects
+{% endblock %}
+{% block content %}
+<section class="projects-section">
+	  <div class="container">
+	    <h2 class="name" class="text-center mb-5" >My Projects</h2>
+			<div class="row">
+				<div class="col-md-4" mb-4>
+					<div class="card project-card h-100">
+                        <img   src="{{ url_for('static', filename='images/Freelanceportfolio.jpeg') }}" class="card-img-top" alt="Project Image">
+                        
+						<div class="card-body">
+                            <h5 class="card-title">Freelance Portfolio Website</h5>
+                            <p class="card-text">Personal portfolio website developed using HTML, CSS, JavaScript and frameworks like Flask and Django.</p>
+                            
+						</div>
+                        <a href="#" class="btn btn-primary">View Project</a>
+					</div>
+				</div>
+				<div class="col-md-4" mb-4>
+					<div class="card project-card h-100">
+                        <img   src="{{ url_for('static', filename='images/college-website.jpeg') }}" class="card-img-top" alt="Project Image">
+                        
+						<div class="card-body">
+                            <h5 class="card-title">College Website</h5>
+                            <p class="card-text">College management website using Flask and MySQL and Devops concepts.</p>
+                            
+						</div>
+                        <a href="#" class="btn btn-primary">View Project</a>
+					</div>
+				</div>
+
+				<div class="col-md-4" mb-4>
+					<div class="card project-card h-100">
+                        <img   src="{{ url_for('static', filename='images/Devops-CICD.jpeg') }}" class="card-img-top" alt="Project Image">
+                        
+						<div class="card-body">
+                            <h5 class="card-title">Devops CI/CD Project</h5>
+                            <p class="card-text">Implementation of CI/CD pipelines using Docker, Jenkins, and AWS for seamless deployment and management of web applications.</p>
+                            
+						</div>
+                        <a href="#" class="btn btn-primary">View Project</a>
+					</div>
+				</div>	
+	</div>
+	</div>
+</section>
+<section class="projects-section">
+	  <div class="container">
+	    <h2 class="name" class="text-center mb-5" >My Projects</h2>
+			{% for Project in projects %}
+
+				<div class="card mb-4">
+					{% if project[4] %}
+						<img src="{{ url_for('static', filename='images/projects/' + project[4])}} " class="card-img-top" height="250" >
+					{% endif %}
+					<div class="card-body">
+						<h3> {{ project[1] }} </h3>
+						<p> {{ project[2] }} </p>
+						<a href="{{ project[3]}}" target="_blank" class="tn btn-primary">Github </a>
+					</div>
+				</div>					
+			{% endfor %}
+
+{% endblock %}

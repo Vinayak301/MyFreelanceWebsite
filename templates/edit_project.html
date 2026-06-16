@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block tile %}
+Edit Project
+{% endblock %}
+{% block content %}
+<h2> Edit Project </h2>
+
+<section class="admin-section">
+    <div class="container">
+    <form method="POST">
+            <input type="text" name="title" vslue="{{ project[1] }}" class="form-contol mb-3">
+
+            <textarea name="description" class="form-control mb-3" rows="5"> {{ project[2] }} </textarea>
+
+            <input type="text" name="github" value="{{ project[3] }}" class="form-control mb-3">
+
+            <button class="btn btn-success"> Update Project </button>
+
+
+    </form>
+    </div>
+</section>
+
+{% endblock %}

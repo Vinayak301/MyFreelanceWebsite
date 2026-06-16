@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}
+Admin Login
+{% endblock %}
+
+{% block content %}
+<section class="login-section"> 
+	<div class="container">
+		<div class="row align-items-center">
+			<div class="col-lg-6">
+				<h2 class="name">Admin Login</h2> 
+					<form method="POST">
+						<div class="mb-3">
+							<label>Username</label>
+							<input type="text" name="username" class="form-control">
+						</div>
+						<div class="mb-3">
+							<label>Password</Label>
+							<input type="password" name="password" class="form-control">
+						</div>
+					<button class="btn btn-primary"> Login </button>
+					</form>
+			</div>
+		</div>
+	</div>
+ </section>
+{% endblock %}
+

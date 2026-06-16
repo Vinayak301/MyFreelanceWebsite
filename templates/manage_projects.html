@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}
+Manage Projects
+{% endblock %}
+{% block content %}
+<!--About Section-->
+<section class="about-section"> 
+	<div class="container">
+		<table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Actions</th>
+                </tr>
+            </thead> 
+            <tbody>
+                {% for project in Projects %}
+                <tr>
+                    <td> {{ project[0] }} </td>
+                    <td> {{ project[1] }} </td>
+                    <td> <a href="/edit-project/{{ project[0] }} " class="btn btn-warning"> Edit </a>
+                        <a href="/delete-project/{{ project[0] }} " class="btn btn-danger"> Delete </a>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+		</div>
+ </section>
+{% endblock %}

@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, flash, session
 from flask import send_from_directory
-from flask_mysqldb import MySQL
 import mysql.connector
 import os 
 from werkzeug.utils import secure_filename

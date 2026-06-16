@@ -2,7 +2,7 @@ Flask==3.1.1
 Flask-SQLAlchemy==3.1.1
 Flask-wtf==1.2.2
 Flask-Limiter==4.0.0
-Flask-Tailsman=1.1.0
+Flask-Tailsman==1.1.0
 Flask-Login==0.6.3
 pyMySQL==1.1.1
 bcrypt==4.3.0

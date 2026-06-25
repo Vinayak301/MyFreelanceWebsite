@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, session
+from dotenv import load_dotenv
 from flask import send_from_directory
+from functools import wraps
 import mysql.connector
 import os 
 from werkzeug.utils import secure_filename
@@ -7,14 +9,23 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/images/projects' 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.secret_key = "mysecretkey" # Set a secret key for session management
+app.secret_key = os.getenv("SECRET_KEY") # Set a secret key for session management
 
+def admin_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if 'admin' not in session:
+            flash("please login first.", "warning")
+            return redirect('/login')
+        return func(*args, **kwargs)
+    return wrapper
 
+load_dotenv()
 db = mysql.connector.connect( 
-    host="127.0.0.1",
-    user="portfolio_user",
-    password="Portfolio@123",
-    database="portfolio_db"
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
 )
 
 @app.route('/')
@@ -43,9 +54,8 @@ def services():
     return render_template("services.html")
 
 @app.route('/admin')
+@admin_required
 def admin():
-    if 'admin' not in session:
-        return redirect('/login')
     cursor = db.cursor()
     query = """SELECT id, name, email, message, created_at FROM contacts ORDER BY id DESC"""
     cursor.execute(query)
@@ -60,13 +70,12 @@ def login():
         password = request.form['password']
 
         # Simple authentication (replace with actual authentication logic)
-        if username == 'admin' and password == 'admin123':
+        if username == os.getenv("ADMIN_USERNAME") and password == os.getenv("ADMIN_PASSWORD"):
             session['admin'] = True
             return redirect('/admin')
         else:
             flash('Invalid credentials', 'error')
 
-        
     return render_template('login.html')
 
 @app.route('/logout')
@@ -102,8 +111,6 @@ def contact():
 
 @app.route('/add-project', methods=['GET', 'POST'])
 def add_project():
-    if 'admin' not in session:
-        return redirect('/login')
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
@@ -131,8 +138,6 @@ def add_project():
 
 @app.route('/edit-project/<int:id>', methods=['GET', 'POST'])
 def edit_project(id):
-    if 'admin' not in session:
-        return redirect('/login')
     
     cursor = db.cursor()
 
@@ -157,9 +162,6 @@ def edit_project(id):
     
 @app.route('/delete-project/<int:id>')
 def delete_project(id):
-    if 'admin' not in session:
-        return redirect('/login')
-    
         cursor = db.cursor()
 
         cursor.execute("DELETE FROM projects WHERE id=%s", (id,))
@@ -170,23 +172,20 @@ def delete_project(id):
         flash('Project deleted Successfully!', 'success')
         return redirect('/admin')
     
-@app.route('/manage-projects/<int:id>')
+@app.route('/manage-projects')
+@admin_required
 def manage_projects():
-    if 'admin' not in session:
-        return redirect('/login')
-    
-        cursor = db.cursor()
+        cursor = db.cursor(dictionary=True)
 
-        cursor.execute("SELECT FROM projects ORDER BY id DESC")
+        cursor.execute("SELECT * FROM projects ORDER BY id DESC")
 
         projects = cursor.fetchall()
         cursor.close()
-    return render_template('manage_projects.html', projects=projects)
-        
+        return render_template('manage_projects.html', projects=projects)
+
 @app.route('/download-resume')
 def download_resume():
     return send_from_directory('resume', 'resume.pdf', as_attachment=True)
-   
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, port=5001)

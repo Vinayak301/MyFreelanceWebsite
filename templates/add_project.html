@@ -9,18 +9,17 @@ Add Project
 		<div class="row">
 			<div class="col-md-12">
 				<h2 class="name">Add Project</h2>
-                <form method="POST" encrtype="multipart/form-data"></form>
+                <form method="POST" encrtype="multipart/form-data">
+                    <input type="hidden" name=" csrf_token" value="{{ csrf_token() }}">
                     <input type="text" name ="title" class="form-control mb-3" placeholder="Project Title">
                     <textarea name="description" class="form-control mb-3" rows="5" placeholder="Description"> </textarea>
                     <input type="text"  name="github" class="form-control mb-3" placeholder="Github Link">
-                    <div class=""mb-3"> 
+                        <div class=""mb-3"> 
                            <label> Project image </label>
                               <input type="file"  name="image" class="form-control">
-                    </div>
-                    <button class="btn btn-success">Add project</button>
-                    
+                        </div>
+                        <button class="btn btn-success">Add project</button>
                 </form>              
-			 	
 			</div>
 		</div>
     </div>

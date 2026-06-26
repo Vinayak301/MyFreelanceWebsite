@@ -9,6 +9,7 @@ Contact
 			<div class="col-lg-6">
 				<h2 class="name" class="text-center mb-5">Contact Me</h2>
 						<form method="POST" action="/contact">
+							<input type="hidden" name=" csrf_token" value="{{ csrf_token() }}">
 						
 						<div class="mb-3">
 							<label for="name" class="form-label">Name</label>

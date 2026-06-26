@@ -3,6 +3,4 @@ __pycache__/
 *.pyc
 .env
 instance/
-
 portfolio-key.pem
-.env

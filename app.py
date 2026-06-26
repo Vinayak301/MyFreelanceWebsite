@@ -1,26 +1,42 @@
-from flask import Flask, render_template, request, redirect, flash, session
-from dotenv import load_dotenv
+from flask import Flask, render_template, request, redirect, flash, session, url_for
 from flask import send_from_directory
+from flask_bcrypt import Bcrypt
+from flask_wtf.csrf import CSRFProtect
+from dotenv import load_dotenv
 from functools import wraps
 import mysql.connector
 import os 
 from werkzeug.utils import secure_filename
+from datetime import timedelta
+
 
 app = Flask(__name__)
+
+app.permanent_session_lifetime = timedelta(minutes=30)
+
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = False
+
+bcrypt = Bcrypt(app)
 UPLOAD_FOLDER = 'static/images/projects' 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+load_dotenv()
+
 app.secret_key = os.getenv("SECRET_KEY") # Set a secret key for session management
+
+csrf = CSRFProtect(app)
 
 def admin_required(func):
     @wraps(func)
-    def wrapper(*args, **kwargs):
-        if 'admin' not in session:
-            flash("please login first.", "warning")
-            return redirect('/login')
+    def decorated_functions(*args, **kwargs):
+        if not session.get("admin_logged_in"):
+            flash("please login first.", "error")
+            return redirect(url_for("login"))
         return func(*args, **kwargs)
-    return wrapper
+    return decorated_functions
 
-load_dotenv()
+
 db = mysql.connector.connect( 
     host=os.getenv("DB_HOST"),
     user=os.getenv("DB_USER"),
@@ -42,11 +58,11 @@ def skills():
 
 @app.route('/projects')
 def projects():
-    return render_template("projects.html")
     cursor =db.cursor()
     cursor.execute("SELECT * FROM projects")
     projects = cursor.fetchall()
     cursor.close()
+
     return render_template('projects.html', projects=projects)  
 
 @app.route('/services')
@@ -70,9 +86,15 @@ def login():
         password = request.form['password']
 
         # Simple authentication (replace with actual authentication logic)
-        if username == os.getenv("ADMIN_USERNAME") and password == os.getenv("ADMIN_PASSWORD"):
-            session['admin'] = True
-            return redirect('/admin')
+        stored_hash = os.getenv("ADMIN_PASSWORD_HASH")
+    
+        if (
+            username == os.getenv("ADMIN_USERNAME")
+            and bcrypt.check_password_hash(stored_hash, password)
+        ):
+            session.permanent = True
+            session["admin_logged_in"] = True
+            return redirect(url_for("admin"))
         else:
             flash('Invalid credentials', 'error')
 
@@ -110,6 +132,7 @@ def contact():
     return render_template('contact.html')
 
 @app.route('/add-project', methods=['GET', 'POST'])
+@admin_required
 def add_project():
     if request.method == 'POST':
         title = request.form['title']
@@ -137,30 +160,32 @@ def add_project():
     return render_template('add_project.html')
 
 @app.route('/edit-project/<int:id>', methods=['GET', 'POST'])
+@admin_required
 def edit_project(id):
-    
-    cursor = db.cursor()
+    cursor = db.cursor(dictionary=True)
 
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
         github = request.form['github']
        
-        query = """UPDTAE projects SET title=%s, description=%s, github_link=%s WHERE id=%s""" 
+        query = """UPDATE projects SET title=%s, description=%s, github_link=%s WHERE id=%s""" 
         values = (title, description, github, id)
         cursor.execute(query,values)
 
         db.commit()
    
         flash('Project updated Successfully!', 'success')
-        return redirect('/admin')
-        cursor.execute("SELECT * FROM projects WHERE id=%s",(id,))
-        project = cursor.fetchone()
-        cursor.close()
+        return redirect('/manage-projects')
+
+    cursor.execute("SELECT * FROM projects WHERE id=%s",(id,))
+    project = cursor.fetchone()
+    cursor.close()
 
     return render_template('edit_project.html', project=project)
     
 @app.route('/delete-project/<int:id>')
+@admin_required
 def delete_project(id):
         cursor = db.cursor()
 
